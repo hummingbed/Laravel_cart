@@ -13,11 +13,30 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::get('/', function () {
-//     return view('/shop/index');
-// });
+
+// Route::get('/', [
+//     'uses' => 'ProductController@index',
+//     'as'   => 'product.index'
+// ]);
+
+Route::get('/', 'ProductController@index')->name('product.index');
 
 
-Route::get('/', 'ProductController@index');
 
-Route::get('/signup', 'UserController@signup');
+Route::group(['prefix' => 'user'], function(){
+
+    Route::group(['middleware' => 'guest'], function(){
+        Route::get('/signup', 'UserController@getSignUp')->name('user.signup');
+        Route::post('/signup', 'UserController@postSignUp');
+        
+        Route::get('/login', 'UserController@getLogin')->name('user.login');   
+        Route::post('/login', 'UserController@postLogin');
+    });
+  
+    Route::group(['middleware' => 'auth'], function(){
+        Route::get('/profile', 'UserController@userProfile')->name('user.profile');
+        
+    });
+    Route::get('/logout', 'UserController@logout')->name('user.logout');
+    
+});
